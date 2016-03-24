@@ -247,7 +247,6 @@ def import_data():
 #             edges['weight'] += edges.apply(lambda x: weight_edge(x, impression, user), axis = 1)
 #     return edges
 #
-#
 # def weight_edge(x, impression, user):
 #     if any((impression['broadcaster_id'].isin(user[x['followed']==user['facebook_id']]['_id'])) & (impression['distinct_id'].isin(user[x['follower']==user['facebook_id']]['_id']))):
 #         return 1
@@ -265,7 +264,6 @@ def Xy_create(df, column_y, column_id):
         X: exogenous variable
         y: endogenous variable
         user_id: series of the user id
-
     '''
     y = df[column_y]
     df.drop(column_y, axis=1, inplace=True)
@@ -290,7 +288,7 @@ def smooting(X,y):
     smox, smoy = smote.fit_transform(X, y)
     return smox, smoy
 
-if __name__=="__main__":
+if __name__ == "__main__":
     impression_path = '/Users/Fra/Documents/Streamago/Streamago_churn_study/ \
     churn_analysis/stream impression/'
     edges_path = '/Users/Fra/Documents/Streamago/Streamago_churn_study/\
@@ -306,7 +304,7 @@ if __name__=="__main__":
     X, y, user_id = Xy_create(merged_data, 'churn', '_id')
     X_train, X_test, y_train, y_test = cross_validation.train_test_split(X, y,
         test_size=0.3, random_state=0)
-    smox, smoy = smooting(X_train_best, y_train)
+    smox, smoy = smooting(X_train, y_train)
 
     #
     # rndF = ensemble.RandomForestClassifier()
