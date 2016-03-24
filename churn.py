@@ -19,10 +19,10 @@ impression_column_name = ['time', 'distinct_id', 'app_release', 'app_version', '
 
 stream_drop = ['_id', 'source_ip', 'page', 'created_at', 'title', 'text', 'message', 'friends', 'place', 'secret', 'base_uri', 'media_ring', 'bucket', 'video', 'audio', 'live', 'closed', 'stop_live_count', 'play_live_time', 'stop_vod_count', 'play_vod_time', 'size', 'live_at', 'origin_id', 'origin_ip', 'live_confirm_time', 'facebook_post_time', 'facebook_post_id', 'offline_at', 'closed_at', 'id', 'name', 'type', 'public', 'likes_views', 'time', 'short_url', 'device_locale', 'file_name']
 
-user_drop = ['enabled', 'last_ip', 'latitude', 'longitude', 'fb_name', 'fb_email', 'fb_access_token', 'fb_extended_access_token', 'email', 'fb_expires_at', 'fb_issued_at', 'user_friends', 'latest_page', 'languages', 'device_locale', 'public_profile', 'secure_browsing','type', 'allowed_viewers', 'facebook_id', 'created_at','bucket','fb_locale']
+user_drop = ['enabled', 'last_ip', 'latitude', 'longitude', 'fb_name', 'fb_email', 'fb_access_token', 'fb_extended_access_token', 'email', 'fb_expires_at', 'fb_issued_at', 'user_friends', 'latest_page', 'languages', 'device_locale', 'public_profile', 'secure_browsing', 'type', 'allowed_viewers', 'facebook_id', 'created_at', 'bucket', 'fb_locale']
 
-impression_drop=['time','distinct_id','app_release','carrier','city','ios_ifa','lib_version','manufacturer','model','name','os',
-'os_version','radio','region','screen_height','screen_width','wifi','account_status','audio','broadcaster_id','broadcaster_name','facebook_post_id','page','public','screen','stream_message','type','video','facebook_id','locale','mp_country_code','mp_device_model','mp_lib','elapsed','app_version','brand']
+impression_drop = ['time', 'distinct_id', 'app_release', 'carrier', 'city', 'ios_ifa', 'lib_version', 'manufacturer', 'model', 'name', 'os', 'os_version', 'radio', 'region', 'screen_height', 'screen_width', 'wifi', 'account_status', 'audio', 'broadcaster_id', 'broadcaster_name', 'facebook_post_id', 'page', 'public', 'screen', 'stream_message', 'type', 'video', 'facebook_id', 'locale', 'mp_country_code', 'mp_device_model', 'mp_lib', 'elapsed', 'app_version', 'brand']
+
 
 def drop_features(stream_table, user_table):
     '''
@@ -31,10 +31,12 @@ def drop_features(stream_table, user_table):
         user_table: table with user information
         stream_table: stream with streams information
     '''
-    user_table = user_table[user_table['type']=='user']
+
+    user_table = user_table[user_table['type'] == 'user']
     user_table.drop(user_drop, axis=1, inplace=True)
     stream_table.drop(stream_drop, axis=1, inplace=True)
     return stream_table, user_table
+
 
 def drop_impression(impression):
     '''
@@ -47,40 +49,38 @@ def drop_impression(impression):
     impression.drop(drop_list, axis=1, inplace=True)
     return impression
 
-# def from_numpy_to_datetime(dt64):
-#     ts = (dt64 - np.datetime64('1970-01-01T00:00:00Z')) / np.timedelta64(1, 's')
-#     return datetime.utcfromtimestamp(ts)
 
 def create_churn(df, limit):
     '''
-    Define churn column using the limit in input and return the modified dataframe
+    Define churn column using the limit in input and return the modified
+    dataframe
     Args:
         df: dataframe
         limit: day to define churn in integers
     Return:
         df
     '''
-
     max_date = df['last_login'].max()
     limit_churn = max_date - np.timedelta64(limit, 'D')
     df['churn'] = (df['last_login'] < limit_churn).astype(int)
     df.drop('last_login', axis=1, inplace=1)
     return df
 
+
 def clean_user(df):
     '''
     Clean the user dataframe
     '''
-
     df = df[df['last_login'].notnull()]
     df['publish_actions'] = df['publish_actions'].replace([None],[-1])
     df['publish_actions'] = df['publish_actions'].astype(int)
-    df = pd.get_dummies(df, columns = ['gender'])
+    df = pd.get_dummies(df, columns=['gender'])
     df = integerize(df, 'manage_pages')
     df = integerize(df, 'valid_token')
     df = integerize(df, 'public')
     df = integerize(df, 'publish_actions')
     return df
+
 
 def stream_user_merging(stream, user):
     '''
@@ -90,9 +90,8 @@ def stream_user_merging(stream, user):
         user: user table
     Return:
         user: user table
-
     '''
-    stream = pd.get_dummies(stream, columns = ['broadcaster'])
+    stream = pd.get_dummies(stream, columns=['broadcaster'])
     stream = integerize(stream, 'mux')
     user = group_join(stream, user, 'user_id', 'mux', '_id', 'sum')
     user = group_join(stream, user, 'user_id', 'width', '_id', 'max')
@@ -117,6 +116,7 @@ def stream_user_merging(stream, user):
     user = user.fillna(-1)
     return user
 
+
 def impression_user_merging(impressions_folder, df):
     '''
     Merge impressions features with the df table
@@ -126,22 +126,28 @@ def impression_user_merging(impressions_folder, df):
     Return:
         df table with the df
     '''
-
-    total_candies_sent = pd.Series(name = 'candies_sent')
-    total_comments_sent = pd.Series(name ='comments_sent')
+    total_candies_sent = pd.Series(name='candies_sent')
+    total_comments_sent = pd.Series(name='comments_sent')
     for (dirpath, dirnames, filenames) in walk(impressions_folder):
-        filenames = [impressions_folder+filename for filename in filenames if not filename[0]=='.']
+        filenames = [impressions_folder+filename for filename in filenames if
+        not filename[0] == '.']
         for filename in filenames:
-            impression = pd.read_table(filename, engine='python', header=None, names = impression_column_name)
-            temp_candies_sent = impression.groupby(by='distinct_id')['candies_sent'].sum()
-            temp_comments_sent = impression.groupby(by='distinct_id')['comments_sent'].sum()
-            total_candies_sent = total_candies_sent.add(temp_candies_sent, fill_value=0)
-            total_comments_sent = total_comments_sent.add(temp_comments_sent, fill_value=0)
-    df = df.join(total_comments_sent, on = '_id')
-    df = df.join(total_candies_sent, on = '_id')
+            impression = pd.read_table(filename, engine='python', header=None,
+                names=impression_column_name)
+            temp_candies_sent = impression.groupby(by='distinct_id') \
+                ['candies_sent'].sum()
+            temp_comments_sent = impression.groupby(by='distinct_id') \
+                ['comments_sent'].sum()
+            total_candies_sent = total_candies_sent.add(temp_candies_sent,
+                fill_value=0)
+            total_comments_sent = total_comments_sent.add(temp_comments_sent,
+                fill_value=0)
+    df = df.join(total_comments_sent, on='_id')
+    df = df.join(total_candies_sent, on='_id')
     df['candies_sent'] = df['candies_sent'].fillna(-1)
     df['comments_sent'] = df['comments_sent'].fillna(-1)
     return df
+
 
 def group_join(df_group, df_merge, by_column, column_group, merge_on, func):
     '''
@@ -167,9 +173,11 @@ def group_join(df_group, df_merge, by_column, column_group, merge_on, func):
     df_merge = df_merge.join(temp, on=merge_on)
     return df_merge
 
+
 def integerize_join(df, column, df_merge):
     '''
-    Change boolean values of dataframe column to integers replacing null values to -1.
+    Change boolean values of dataframe column to integers replacing null values
+    to -1.
     Join the result to df_merge
     Args:
         df: Pandas dataframe
@@ -179,26 +187,26 @@ def integerize_join(df, column, df_merge):
         df_merge: return the merged dataframe
     '''
 
-    temp = df[column].replace([None], [-1], regex=True )
-
-    #df[column].replace(, -1, inplace=True)
+    temp = df[column].replace([None], [-1], regex=True)
     df[column] = df[column].astype(int)
     df_merge.join(temp)
     return df_merge
 
+
 def integerize(df, column):
     '''
-    Change boolean values of dataframe column to integers replacing null values to -1.
+    Change boolean values of dataframe column to integers replacing null values
+    to -1.
     Args:
         df: Pandas dataframe
         column: Column to integerize
     Return:
         df_merge: return the merged dataframe
     '''
-
     df[column] = df[column].replace([None],[-1],regex=True)
     df[column] = df[column].astype(int)
     return df
+
 
 def import_data():
     '''
@@ -247,7 +255,8 @@ def import_data():
 
 def Xy_create(df, column_y, column_id):
     '''
-    Return X and y ready for the model and user_id to keep track of the users will churn.
+    Return X and y ready for the model and user_id to keep track of the users
+    will churn.
     Args:
         df: Pandas dataframe
         column_y: column where there is endogenous variable
@@ -276,22 +285,27 @@ def smooting(X,y):
         smox: balaned exogenous variable
         smoy: balanced endogenous variable
     '''
-    smote = SMOTE(ratio= float(np.count_nonzero(y_test==0)) / float(np.count_nonzero(y_test==1)), verbose=False, kind='regular')
-    smox, smoy = smote.fit_transform(X,y)
+    smote = SMOTE(ratio=float(np.count_nonzero(y_test == 0)) /
+        float(np.count_nonzero(y_test == 1)), verbose=False, kind='regular')
+    smox, smoy = smote.fit_transform(X, y)
     return smox, smoy
 
 if __name__=="__main__":
-    impression_path = '/Users/Fra/Documents/Streamago/Streamago_churn_study/stream impression/'
-    edges_path = '/Users/Fra/Documents/Streamago/Streamago_churn_study/graph/notify.csv'
+    impression_path = '/Users/Fra/Documents/Streamago/Streamago_churn_study/ \
+    churn_analysis/stream impression/'
+    edges_path = '/Users/Fra/Documents/Streamago/Streamago_churn_study/\
+    churn_analysis/graph/notify.csv'
     stream_table, user_table = import_data()
     strem_table, user_table = drop_features(stream_table, user_table)
     user_table = clean_user(user_table)
     user_table = create_churn(user_table, 14)
     merged_data = stream_user_merging(stream_table, user_table)
-    merged_data = impression_user_merging('/Users/Fra/Documents/Streamago/Streamago_churn_study/stream impression/', merged_data)
+    merged_data = impression_user_merging('/Users/Fra/Documents/Streamago/\
+    Streamago_churn_study/churn_analysis/stream impression/', merged_data)
     merged_data = merged_data.fillna(-1)
     X, y, user_id = Xy_create(merged_data, 'churn', '_id')
-    X_train, X_test, y_train, y_test = cross_validation.train_test_split(X, y, test_size=0.3, random_state=0)
+    X_train, X_test, y_train, y_test = cross_validation.train_test_split(X, y,
+        test_size=0.3, random_state=0)
     smox, smoy = smooting(X_train_best, y_train)
 
     #
