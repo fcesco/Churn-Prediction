@@ -13,7 +13,7 @@ import operator
 from unbalanced_dataset import SMOTE
 from scipy.stats import randint as sp_randint
 from sklearn import cross_validation
-
+from collections import Counter
 
 impression_column_name = ['time', 'distinct_id', 'app_release', 'app_version', 'carrier', 'city', 'ios_ifa', 'lib_version', 'manufacturer', 'model', 'name', 'os', 'os_version', 'radio', 'region',  'screen_height', 'screen_width', 'wifi', 'account_status', 'audio', 'broadcaster_id', 'broadcaster_name', 'candies_sent', 'comments_sent', 'facebook_post_id', 'mode', 'page',  'public', 'screen', 'stream_duration', 'stream_id', 'stream_message', 'type', 'video', 'views_on_join', 'facebook_id', 'gender', 'locale', 'mp_country_code', 'mp_device_model', 'mp_lib', 'elapsed', 'app_version', 'screen_dpi', 'brand']
 
@@ -67,6 +67,25 @@ def create_churn(df, limit):
     return df
 
 
+def filter_time(stream, user, days):
+    '''
+    Limit informations of the users and streams in order to simulate that we do
+    not know about the future.
+    Args:
+        stream: streams dataframe
+        user: users dataframe
+        days: days where we want to cut our information (churn days)
+    Return:
+        stream: streams dataframe limited on informations
+        user: users dataframe with limited informations
+    '''
+    max_date = user['last_login'].max()
+    limit_time = max_date - np.timedelta64(days, 'D')
+    user = user[user['created_at']<limit_time]
+    stream = stream[stream['created_at']<limit_time]
+    return stream, user
+
+
 def clean_user(df):
     '''
     Clean the user dataframe
@@ -116,8 +135,12 @@ def stream_user_merging(stream, user):
     user = user.fillna(-1)
     return user
 
+    for (dirpath, dirnames, filenames) in walk(impression_path):
+        filenames = [impression_path+filename for filename in filenames if
+        not filename[0] == '.']
 
-def impression_user_merging(impressions_folder, df):
+
+def impression_user_merging(impressions_folder, df, churn_days):
     '''
     Merge impressions features with the df table
     Args:
@@ -128,22 +151,25 @@ def impression_user_merging(impressions_folder, df):
     '''
     total_candies_sent = pd.Series(name='candies_sent')
     total_comments_sent = pd.Series(name='comments_sent')
+    limit_date = user['last_login'].max() - np.timedelta64(days, 'D')
     for (dirpath, dirnames, filenames) in walk(impressions_folder):
         filenames = [impressions_folder+filename for filename in filenames if
         not filename[0] == '.']
         for filename in filenames:
-            impression = pd.read_table(filename, engine='python', header=None,
-                names=impression_column_name)
-            temp_candies_sent = impression.groupby(by='distinct_id') \
-                ['candies_sent'].sum()
-            temp_comments_sent = impression.groupby(by='distinct_id') \
-                ['comments_sent'].sum()
-            total_candies_sent = total_candies_sent.add(temp_candies_sent,
-                fill_value=0)
-            total_comments_sent = total_comments_sent.add(temp_comments_sent,
-                fill_value=0)
-    df = df.join(total_comments_sent, on='_id')
-    df = df.join(total_candies_sent, on='_id')
+            date = datetime.strptime(filename[:8], '%Y%m%d')
+            if date < limit_ date:
+                impression = pd.read_table(filename, engine='python', header=None,
+                    names=impression_column_name)
+                temp_candies_sent = impression.groupby(by='distinct_id') \
+                    ['candies_sent'].sum()
+                temp_comments_sent = impression.groupby(by='distinct_id') \
+                    ['comments_sent'].sum()
+                total_candies_sent = total_candies_sent.add(temp_candies_sent,
+                    fill_value=0)
+                total_comments_sent = total_comments_sent.add(temp_comments_sent,
+                    fill_value=0)
+                df = df.join(total_comments_sent, on='_id')
+                df = df.join(total_candies_sent, on='_id')
     df['candies_sent'] = df['candies_sent'].fillna(-1)
     df['comments_sent'] = df['comments_sent'].fillna(-1)
     return df
@@ -226,9 +252,28 @@ def import_data():
     return streams, users
 
 
-# def create_node_value(churn_prob, user_id):
-#     churn_prob = pd.DataFrame(data = {'user_id': user_id , 'churn_prob': churn_prob})
-#     return churn_prob
+def n_connections(edges_path, df):
+    '''
+    Add number of followers and following
+    Args:
+        edges_path: path to the edges file
+        df: main pandas DataFrame
+    Return:
+        df: main pandas DataFrame with follower and following
+    '''
+    edges = pd.read_csv(edges_path)
+    edges = edges[edges.exists==True]
+    following = Counter(edges.follower.values)
+    followed = Counter(edges.followed.values)
+    following = pd.Series(following)
+    followed = pd.Series(followed)
+    df.merge(following)
+    df.merge(followed)
+    return df
+    
+ def create_node_value(churn_prob, user_id):
+     churn_prob = pd.DataFrame(data = {'user_id': user_id , 'churn_prob': churn_prob})
+     return churn_prob
 #
 #
 # def weighted_edges(edges_file, impressions_folder, user):
@@ -283,28 +328,28 @@ def smooting(X,y):
         smox: balaned exogenous variable
         smoy: balanced endogenous variable
     '''
-    smote = SMOTE(ratio=float(np.count_nonzero(y_test == 0)) /
-        float(np.count_nonzero(y_test == 1)), verbose=False, kind='regular')
+    smote = SMOTE(ratio=float(np.count_nonzero(y == 0)) /
+        float(np.count_nonzero(y == 1)), verbose=False, kind='regular')
     smox, smoy = smote.fit_transform(X, y)
     return smox, smoy
-
-if __name__ == "__main__":
-    impression_path = '/Users/Fra/Documents/Streamago/Streamago_churn_study/ \
-    churn_analysis/stream impression/'
-    edges_path = '/Users/Fra/Documents/Streamago/Streamago_churn_study/\
-    churn_analysis/graph/notify.csv'
-    stream_table, user_table = import_data()
-    strem_table, user_table = drop_features(stream_table, user_table)
-    user_table = clean_user(user_table)
-    user_table = create_churn(user_table, 14)
-    merged_data = stream_user_merging(stream_table, user_table)
-    merged_data = impression_user_merging('/Users/Fra/Documents/Streamago/\
-    Streamago_churn_study/churn_analysis/stream impression/', merged_data)
-    merged_data = merged_data.fillna(-1)
-    X, y, user_id = Xy_create(merged_data, 'churn', '_id')
-    X_train, X_test, y_train, y_test = cross_validation.train_test_split(X, y,
-        test_size=0.3, random_state=0)
-    smox, smoy = smooting(X_train, y_train)
+    #
+    # if __name__ == "__main__":
+    #     impression_path = '/Users/Fra/Documents/Streamago/Streamago_churn_study/ \
+    #     churn_analysis/stream impression/'
+    #     edges_path = '/Users/Fra/Documents/Streamago/Streamago_churn_study/\
+    #     churn_analysis/graph/notify.csv'
+    #     stream_table, user_table = import_data()
+    #     strem_table, user_table = drop_features(stream_table, user_table)
+    #     user_table = clean_user(user_table)
+    #     user_table = create_churn(user_table, 14)
+    #     merged_data = stream_user_merging(stream_table, user_table)
+    #     merged_data = impression_user_merging('/Users/Fra/Documents/Streamago/\
+    #     Streamago_churn_study/churn_analysis/stream impression/', merged_data)
+    #     merged_data = merged_data.fillna(-1)
+    #     X, y, user_id = Xy_create(merged_data, 'churn', '_id')
+    #     X_train, X_test, y_train, y_test = cross_validation.train_test_split(X, y,
+    #         test_size=0.3, random_state=0)
+    #     smox, smoy = smooting(X_train, y_train)
 
     #
     # rndF = ensemble.RandomForestClassifier()
