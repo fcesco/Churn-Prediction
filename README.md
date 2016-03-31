@@ -1,3 +1,5 @@
+#Work in Progress
+
 ## Streamago Churn analysis
 Using data science algorithms in order to predict churn of Streamago application.
 

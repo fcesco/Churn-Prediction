@@ -15,13 +15,13 @@ from scipy.stats import randint as sp_randint
 from sklearn import cross_validation
 from collections import Counter
 
-impression_column_name = ['time', 'distinct_id', 'app_release', 'app_version', 'carrier', 'city', 'ios_ifa', 'lib_version', 'manufacturer', 'model', 'name', 'os', 'os_version', 'radio', 'region',  'screen_height', 'screen_width', 'wifi', 'account_status', 'audio', 'broadcaster_id', 'broadcaster_name', 'candies_sent', 'comments_sent', 'facebook_post_id', 'mode', 'page',  'public', 'screen', 'stream_duration', 'stream_id', 'stream_message', 'type', 'video', 'views_on_join', 'facebook_id', 'gender', 'locale', 'mp_country_code', 'mp_device_model', 'mp_lib', 'elapsed', 'app_version', 'screen_dpi', 'brand']
+IMPRESSION_COLUMN_NAME = ['time', 'distinct_id', 'app_release', 'app_version', 'carrier', 'city', 'ios_ifa', 'lib_version', 'manufacturer', 'model', 'name', 'os', 'os_version', 'radio', 'region',  'screen_height', 'screen_width', 'wifi', 'account_status', 'audio', 'broadcaster_id', 'broadcaster_name', 'candies_sent', 'comments_sent', 'facebook_post_id', 'mode', 'page',  'public', 'screen', 'stream_duration', 'stream_id', 'stream_message', 'type', 'video', 'views_on_join', 'facebook_id', 'gender', 'locale', 'mp_country_code', 'mp_device_model', 'mp_lib', 'elapsed', 'app_version', 'screen_dpi', 'brand']
 
-stream_drop = ['_id', 'source_ip', 'page', 'created_at', 'title', 'text', 'message', 'friends', 'place', 'secret', 'base_uri', 'media_ring', 'bucket', 'video', 'audio', 'live', 'closed', 'stop_live_count', 'play_live_time', 'stop_vod_count', 'play_vod_time', 'size', 'live_at', 'origin_id', 'origin_ip', 'live_confirm_time', 'facebook_post_time', 'facebook_post_id', 'offline_at', 'closed_at', 'id', 'name', 'type', 'public', 'likes_views', 'time', 'short_url', 'device_locale', 'file_name']
+STREAM_DROP = ['_id', 'source_ip', 'page', 'created_at', 'title', 'text', 'message', 'friends', 'place', 'secret', 'base_uri', 'media_ring', 'bucket', 'video', 'audio', 'live', 'closed', 'stop_live_count', 'play_live_time', 'stop_vod_count', 'play_vod_time', 'size', 'live_at', 'origin_id', 'origin_ip', 'live_confirm_time', 'facebook_post_time', 'facebook_post_id', 'offline_at', 'closed_at', 'id', 'name', 'type', 'public', 'likes_views', 'time', 'short_url', 'device_locale', 'file_name']
 
-user_drop = ['enabled', 'last_ip', 'latitude', 'longitude', 'fb_name', 'fb_email', 'fb_access_token', 'fb_extended_access_token', 'email', 'fb_expires_at', 'fb_issued_at', 'user_friends', 'latest_page', 'languages', 'device_locale', 'public_profile', 'secure_browsing', 'type', 'allowed_viewers', 'facebook_id', 'created_at', 'bucket', 'fb_locale']
+USER_DROP = ['enabled', 'last_ip', 'latitude', 'longitude', 'fb_name', 'fb_email', 'fb_access_token', 'fb_extended_access_token', 'email', 'fb_expires_at', 'fb_issued_at', 'user_friends', 'latest_page', 'languages', 'device_locale', 'public_profile', 'secure_browsing', 'type', 'allowed_viewers', 'facebook_id', 'created_at', 'bucket', 'fb_locale']
 
-impression_drop = ['time', 'distinct_id', 'app_release', 'carrier', 'city', 'ios_ifa', 'lib_version', 'manufacturer', 'model', 'name', 'os', 'os_version', 'radio', 'region', 'screen_height', 'screen_width', 'wifi', 'account_status', 'audio', 'broadcaster_id', 'broadcaster_name', 'facebook_post_id', 'page', 'public', 'screen', 'stream_message', 'type', 'video', 'facebook_id', 'locale', 'mp_country_code', 'mp_device_model', 'mp_lib', 'elapsed', 'app_version', 'brand']
+IMPRESSION_DROP = ['time', 'distinct_id', 'app_release', 'carrier', 'city', 'ios_ifa', 'lib_version', 'manufacturer', 'model', 'name', 'os', 'os_version', 'radio', 'region', 'screen_height', 'screen_width', 'wifi', 'account_status', 'audio', 'broadcaster_id', 'broadcaster_name', 'facebook_post_id', 'page', 'public', 'screen', 'stream_message', 'type', 'video', 'facebook_id', 'locale', 'mp_country_code', 'mp_device_model', 'mp_lib', 'elapsed', 'app_version', 'brand']
 
 
 def drop_features(stream_table, user_table):
@@ -33,8 +33,8 @@ def drop_features(stream_table, user_table):
     '''
 
     user_table = user_table[user_table['type'] == 'user']
-    user_table.drop(user_drop, axis=1, inplace=True)
-    stream_table.drop(stream_drop, axis=1, inplace=True)
+    user_table.drop(USER_DROP, axis=1, inplace=True)
+    stream_table.drop(STREAM_DROP, axis=1, inplace=True)
     return stream_table, user_table
 
 
@@ -151,15 +151,15 @@ def impression_user_merging(impressions_folder, df, churn_days):
     '''
     total_candies_sent = pd.Series(name='candies_sent')
     total_comments_sent = pd.Series(name='comments_sent')
-    limit_date = user['last_login'].max() - np.timedelta64(days, 'D')
+    limit_date = df['last_login'].max() - np.timedelta64(days, 'D')
     for (dirpath, dirnames, filenames) in walk(impressions_folder):
         filenames = [impressions_folder+filename for filename in filenames if
         not filename[0] == '.']
         for filename in filenames:
             date = datetime.strptime(filename[:8], '%Y%m%d')
-            if date < limit_ date:
+            if date < limit_date:
                 impression = pd.read_table(filename, engine='python', header=None,
-                    names=impression_column_name)
+                    names=IMPRESSION_COLUMN_NAME)
                 temp_candies_sent = impression.groupby(by='distinct_id') \
                     ['candies_sent'].sum()
                 temp_comments_sent = impression.groupby(by='distinct_id') \
@@ -270,10 +270,10 @@ def n_connections(edges_path, df):
     df.merge(following)
     df.merge(followed)
     return df
-    
- def create_node_value(churn_prob, user_id):
-     churn_prob = pd.DataFrame(data = {'user_id': user_id , 'churn_prob': churn_prob})
-     return churn_prob
+ #
+ # def create_node_value(churn_prob, user_id):
+ #     churn_prob = pd.DataFrame(data = {'user_id': user_id , 'churn_prob': churn_prob})
+ #     return churn_prob
 #
 #
 # def weighted_edges(edges_file, impressions_folder, user):
