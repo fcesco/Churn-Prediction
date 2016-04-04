@@ -1,22 +1,66 @@
-from sklearn import cross_validation
+from sklearn.cross_validation import cross_val_score
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.linear_model import SGDClassifier
 from sklearn.ensemble import GradientBoostingClassifier
 from sklearn.metrics import confusion_matrix, roc_curve
 from sklearn.grid_search import RandomizedSearchCV
+from sklearn.metrics import roc_curve, precision_score, accuracy_score
 from scipy.stats import randint as sp_randint
 import numpy as np
 
-
-class model_params(object):
-    def __init__(self, model, params):
-        self.model
-        self.params
-
+class ModelParams(object):
+    """
+    Create an object of the model, its parameters, name etc...
+    Instance Attributes:
+        self.model: sklearn model
+        self.params: set of parameters for grid search
+        self.name: name of the model (string)
+    List of methods:
+    __init__: class initialization
+    """
+    def __init__(self, model, params, name):
+        """
+        Initialization of the class adding its most important attributes.
+        Args:
+            model: sklearn model
+            params: set of parameters for grid search
+            name: name of the model (string)
+        """
+        self.model = model
+        self.params = params
+        self.name = name
 
 class ModelComparator(object):
-    def __init__(self, models_params, X, y):
+    """
+    Compare models and store score information in the model objects.
+    Instance Attributes:
+        self.model_scoring: method used for the scoring of the model
+        self.models_params: list of ModelParams objects
+        self.X: exogenous variable
+        self.y: endogenous variable
+        self.X_train: exogenous train variable
+        self.y_train: endogenous train variable
+        self.X_test: exogenous test variable
+        self.y_test: endogenous test variable
+    List of methods:
+    __init__: instance initialization
+    compare_models: calculate score values and roc for each model
+    best_model: find the best estimator for a specific model
+    cross_val: calculate the cross validation scores
+    test: calculate the score for the test
+    model_roc_curve: calculate roc curve values
+    """
+    def __init__(self, models_params, X, y, scoring):
+        """
+        Initialization fo the instance
+        Args:
+            models_params: list of ModelParams objects
+            X: exogenous variable
+            y: endogenous variable
+            scoring: method for scoring
+        """
+        self.model_scoring = scoring
         self.models_params = models_params
         self.X = X
         self.y = y
@@ -24,47 +68,63 @@ class ModelComparator(object):
             cross_validation.train_test_split(X, y, test_size=0.3,
             random_state=0)
 
-    def train_model(self):
-        for model in self.models:
-            model_param.model.fit(self.X_train, self.y_train)
+    def compare_models(self):
+        """
+        Iterate through each model and calculate most important scores and
+        parameters for roc curve
+        """
+        for model in self.models_params:
+            model.best_estimator = self.best_model(model)
+            model.cross_val = self.cross_val(model)
+            model.test_score = self.test(model)
+            model.fpr, model.tpr, model.threshold = self.model_roc_curve(model)
 
+    def best_model(self, model, iter=20):
+        """
+        Find the best model using a random search of the parameters.
+        Args:
+            model: estimator used for the random parameters search
+            iter: number of iteration of the random search
+        Return:
+            best_estimator: Best estimator found
+        """
+        rndGrid = RandomizedSearchCV(model.model,
+            model.params, n_iter=iter, scoring=self.model_scoring, n_jobs=-1)
+        rndGrid.fit(self.X_train, self.y_train)
+        best_estimator = rndGrid.best_estimator_
+        return best_estimator
 
-    def best_model(self, iter=20):
-        for model in self.models:
-            rndGrid = RandomizedSearchCV(model_param.model,
-                params, n_iter=n_iter)
-            rndGrid.fit(X_train, y_train)
-            return rndGrid.best_estimator_, rndGrid.best_params
+    def cross_val(self, model):
+        """
+        Cross validate the model using a 5 folds cross validation
+        Args:
+            model: ModelParams object used for the cross validation
+        Return:
+            score: score of the cross validation
+        """
+        score = cross_val_score(estimator=model.best_estimator, X=self.X_train,\
+        y = self.y_train, scoring=self.model_scoring, cv=5, n_jobs=-1)
+        return score
 
+    def test(self, model):
+        """
+        Assess score on the test set
+        Args:
+            model: ModelParams object
+        Return:
+            score: score of the test validation
 
-    DECISION_TREE_PARAMS = {"max_depth": [9,7,5,3, None],
-                          "max_features": sp_randint(1, 11),
-                          "min_samples_split": sp_randint(1, 11),
-                          "min_samples_leaf": sp_randint(1, 11),
-                          "max_leaf_nodes" : [1,2,3,4,5,6,7,8, None]}
+        """
+        model.best_estimator.fit(self.X_tran, self.y_train)
+        score =  self.best_model.score(X_test, y_test, scoring=self.model_scoring)
+        return score
 
-    RANDOM_FOREST_PARAMS = {"max_depth": [9,7,5,3, None],
-                          "max_features": sp_randint(1, 11),
-                          "min_samples_split": sp_randint(1, 11),
-                          "min_samples_leaf": sp_randint(1, 11),
-                          "bootstrap": [True, False],
-                          "criterion": ["gini", "entropy"]}
-
-    SDG_PARAMS = {"loss" : ['hinge', 'log', 'modified_huber','squared_hinge'],
-                        "penalty" : ['l2', 'l1', 'elasticnet'],
-                         "alpha": list(np.arange(0.000001, 10, 0.00001))}
-
-    GRADIENT_BOOST_PARAMS = {"loss": ['deviance', 'exponential'],
-                            "learning_rate": list(np.arange(0.01, 10, 0.8)),
-                            "n_estimators": range(10, 100, 10),
-                            "max_depth": range(1, 10, 1),
-                            "min_samples_split": [2, 4, 6],
-                            "min_samples_leaf": [1, 2, 4, 5]}
-
-if __name__=="__main__":
-    tree_param = model_params(DecisionTreeClassifier(), DECISION_TREE_PARAMS)
-    rndF_param = model_params(RandomForestClassifier(), RANDOM_FOREST_PARAMS)
-    sdg_param = model_params(SGDClassifier(), SDG_PARAMS)
-    grd_param = model_params(GradientBoostingClassifier(), GRADIENT_BOOST_PARAMS)
-    models = [tree_param, rndF_param, sdg_param, grd_param]
-    mod_comp = ModelComparator(models, X, y)
+    def model_roc_curve(self, model):
+        """
+        Produce information for plotting the roc curve
+        
+        """
+        model.model.fit(self.X_train, self.y_train)
+        prob = model.model.predict_proba(self.X_test)
+        fpr, tpr, threshold = roc_curve(self.y_test, prob, pos_label=1)
+        return fpr, tpr, threshold

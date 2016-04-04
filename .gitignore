@@ -3,3 +3,4 @@
 graph/
 stream\ impression
 *.json
+*.pyc

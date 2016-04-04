@@ -15,10 +15,6 @@ i. Contents
 + [Note](#note)
 
 
-
-
-
-
 ### <a name="streamago"></a> What is Streamago?
 Streamago is an emerging startup of live streaming video with more than 130k DAU and 500 MAU. Streamago lets you interact with your close friends and to meet new one through live video. Users can comments and likes live streams in real time. In the end is possible to follow your new friends.
 
