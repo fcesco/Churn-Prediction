@@ -116,12 +116,12 @@ class ModelComparator(object):
 
         """
         model.best_estimator.fit(self.X_train, self.y_train)
-        y_pred = model.best_estimator(self.X_test)
+        y_pred = model.best_estimator.predict(self.X_test)
         if self.model_scoring == 'recall':
             score = model.best_estimator.recall_score(self.y_test, y_pred)
         elif self.model_scoring == 'precision':
             score = precision_score(self.y_test, y_pred)
-        return scores
+        return score
 
     def model_roc_curve(self, model):
         """
