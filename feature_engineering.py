@@ -89,11 +89,11 @@ def filter_time(stream, user, days):
 
     max_date = user['last_login'].max()
     upper_limit_date = max_date - np.timedelta64(days, 'D')
-    lower_limit_date = max_date - np.timedelta64(days*3, 'D')
+    lower_limit_date = max_date - np.timedelta64(days*2, 'D')
     user = user[user['created_at'] < upper_limit_date]
     stream = stream[stream['created_at'] < upper_limit_date]
-    user = user[user['created_at']>lower_limit_date]
-    stream = stream[stream['created_at']>lowe_limit_date]
+    #we take user that did not already churn
+    user = user[user['last_login'] > lower_limit_date]
     return stream, user
 
 
