@@ -21,7 +21,7 @@ IMPRESSION_COLUMN_NAME = ['time', 'distinct_id', 'app_release', 'app_version', '
 
 STREAM_DROP = ['_id', 'source_ip', 'page', 'created_at', 'title', 'text', 'message', 'friends', 'place', 'secret', 'base_uri', 'media_ring', 'bucket', 'video', 'audio', 'live', 'closed', 'stop_live_count', 'play_live_time', 'stop_vod_count', 'play_vod_time', 'size', 'live_at', 'origin_id', 'origin_ip', 'live_confirm_time', 'facebook_post_time', 'facebook_post_id', 'offline_at', 'closed_at', 'id', 'name', 'type', 'public', 'likes_views', 'time', 'short_url', 'device_locale', 'file_name']
 
-USER_DROP = ['max_duration', 'session_duration', 'max_width', 'max_height', 'max_bitrate', 'max_video_duration', 'max_audio_duration','enabled', 'last_ip', 'latitude', 'longitude', 'fb_name', 'fb_email', 'fb_access_token', 'fb_extended_access_token', 'email', 'fb_expires_at', 'fb_issued_at', 'user_friends', 'latest_page', 'languages', 'device_locale', 'public_profile', 'secure_browsing', 'type', 'allowed_viewers', 'created_at', 'bucket', 'fb_locale','valid_token']
+USER_DROP = ['max_duration', 'session_duration', 'max_width', 'max_height', 'max_bitrate', 'max_video_duration', 'max_audio_duration','enabled', 'last_ip', 'latitude', 'longitude', 'fb_name', 'fb_email', 'fb_access_token', 'fb_extended_access_token', 'email', 'fb_expires_at', 'fb_issued_at', 'user_friends', 'latest_page', 'languages', 'device_locale', 'public_profile', 'secure_browsing', 'type', 'allowed_viewers', 'created_at', 'bucket', 'fb_locale','valid_token', 'public']
 
 IMPRESSION_DROP = ['time', 'distinct_id', 'app_release', 'carrier', 'city', 'ios_ifa', 'lib_version', 'manufacturer', 'model', 'name', 'os', 'os_version', 'radio', 'region', 'screen_height', 'screen_width', 'wifi', 'account_status', 'audio', 'broadcaster_id', 'broadcaster_name', 'facebook_post_id', 'page', 'public', 'screen', 'stream_message', 'type', 'video', 'facebook_id', 'locale', 'mp_country_code', 'mp_device_model', 'mp_lib', 'elapsed', 'app_version', 'brand']
 
@@ -112,7 +112,6 @@ def clean_user(df):
     df = pd.get_dummies(df, columns=['gender'])
     df.drop('gender_female', axis=1, inplace=True)
     df = integerize(df, 'manage_pages')
-    df = integerize(df, 'public')
     df = integerize(df, 'publish_actions')
     df.drop('last_login', axis=1, inplace=1)
     return df

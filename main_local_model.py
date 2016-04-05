@@ -1,7 +1,6 @@
-from churn import *
+from feature_engineering import *
 from models_comparison import *
 from data_viz import *
-from models_comparison import *
 
 IMPRESSION_PATH = '/Users/Fra/Documents/Streamago/Streamago_churn_study/\
 churn_analysis/stream impression/'
@@ -34,29 +33,20 @@ GRADIENT_BOOST_PARAMS = {"loss": ['deviance', 'exponential'],
                             "min_samples_leaf": [1, 2, 4, 5]
                             }
 
-if __name__=="__main__":
-    #Data Munging / Feature engineering
-    # churn_days = 10
-    # stream_table, user_table = import_data()
-    # user_table = create_churn(user_table, churn_days)
-    # stream_table, user_table = filter_time(stream_table, user_table, churn_days)
-    # user_table = impression_user_merging(IMPRESSION_PATH, user_table, churn_days)
-    # stream_table, user_table = drop_features(stream_table, user_table)
-    # user_table = clean_user(user_table)
-    # merged_table = stream_user_merging(stream_table, user_table)
-    # merged_table = n_connections(EDGES_PATH, merged_table)
-    # merged_table = merged_table.fillna(-1)
+def data_munging_engineering():
+    churn_days = 10
+    stream_table, user_table = import_data()
+    user_table = create_churn(user_table, churn_days)
+    stream_table, user_table = filter_time(stream_table, user_table, churn_days)
+    user_table = impression_user_merging(IMPRESSION_PATH, user_table, churn_days)
+    stream_table, user_table = drop_features(stream_table, user_table)
+    user_table = clean_user(user_table)
+    merged_table = stream_user_merging(stream_table, user_table)
+    merged_table = n_connections(EDGES_PATH, merged_table)
+    merged_table = merged_table.fillna(-1)
+    return merged_table
 
-
-    #Data visualization
-
-
-
-
-
-    #Models Comparison
-    #tree_param = ModelParams(DecisionTreeClassifier(), DECISION_TREE_PARAMS, 'decision')
-    merged_table = pd.read_pickle('merged_table')
+def model_choice(merged_table):
     X, y, user_id, facebook_id = Xy_create(merged_table, 'churn', '_id', 'facebook_id')
     rndF_param = ModelParams(RandomForestClassifier(), RANDOM_FOREST_PARAMS, 'Random Forest')
     extra_param = ModelParams(ExtraTreesClassifier(), EXTRA_TREES_PARAMS, 'extra')
@@ -64,3 +54,14 @@ if __name__=="__main__":
     models =  [rndF_param, extra_param, grd_param]
     model_comparator = ModelComparator(models, X, y, 'recall')
     model_comparator.compare_models()
+    return model_comparator
+
+if __name__=="__main__":
+    munging = False
+    #Data Munging / Feature engineering
+    if munging == True:
+        merged_table = data_munging_engineering()
+    else:
+        merged_table = pd.read_pickle('merged_table')
+    #Models Comparison
+    mod_comp = model_choice(merged_table)
