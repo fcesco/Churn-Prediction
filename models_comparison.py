@@ -129,6 +129,6 @@ class ModelComparator(object):
 
         """
         model.model.fit(self.X_train, self.y_train)
-        prob = model.model.predict_proba(self.X_test)
-        fpr, tpr, threshold = roc_curve(self.y_test.values, prob, pos_label=1)
+        prob = model.best_estimator.predict_proba(self.X_test)[:,1]
+        fpr, tpr, threshold = roc_curve(self.y_test, prob, pos_label=1)
         return fpr, tpr, threshold
