@@ -1,8 +1,8 @@
 from sklearn.cross_validation import cross_val_score, train_test_split
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.linear_model import SGDClassifier
 from sklearn.ensemble import GradientBoostingClassifier
+from sklearn.ensemble import ExtraTreesClassifier
 from sklearn.metrics import confusion_matrix, roc_curve
 from sklearn.grid_search import RandomizedSearchCV
 from sklearn.metrics import roc_curve, precision_score, recall_score
@@ -75,8 +75,8 @@ class ModelComparator(object):
         """
         for model in self.models_params:
             model.best_estimator = self.best_model(model)
-            model.cross_val = self.cross_val(model)
-            model.test_score = self.test(model)
+            model.cross_val_recall, model.cross_val_precision = self.cross_val(model)
+            model.recall_test, model.precision_test = self.test(model)
             model.fpr, model.tpr, model.threshold = self.model_roc_curve(model)
 
     def best_model(self, model, iter=20):
@@ -102,9 +102,11 @@ class ModelComparator(object):
         Return:
             score: score of the cross validation
         """
-        score = cross_val_score(estimator=model.best_estimator, X=self.X_train,\
-        y = self.y_train, scoring=self.model_scoring, cv=5, n_jobs=-1)
-        return score
+        cross_val_recall = cross_val_score(estimator=model.best_estimator, X=self.X_train,\
+        y = self.y_train, scoring='recall', cv=5, n_jobs=-1)
+        cross_val_precision = cross_val_score(estimator=model.best_estimator, X=self.X_train,\
+        y = self.y_train, scoring='recall', cv=5, n_jobs=-1)
+        return cross_val_recall, cross_val_precision
 
     def test(self, model):
         """
@@ -117,18 +119,16 @@ class ModelComparator(object):
         """
         model.best_estimator.fit(self.X_train, self.y_train)
         y_pred = model.best_estimator.predict(self.X_test)
-        if self.model_scoring == 'recall':
-            score = recall_score(self.y_test, y_pred)
-        elif self.model_scoring == 'precision':
-            score = precision_score(self.y_test, y_pred)
-        return score
+        recall = recall_score(self.y_test, y_pred)
+        precision = precision_score(self.y_test, y_pred)
+        return recall, precision
 
     def model_roc_curve(self, model):
         """
         Produce information for plotting the roc curve
 
         """
-        model.model.fit(self.X_train, self.y_train)
+        model.best_estimator.fit(self.X_train, self.y_train)
         prob = model.best_estimator.predict_proba(self.X_test)[:,1]
         fpr, tpr, threshold = roc_curve(self.y_test, prob, pos_label=1)
         return fpr, tpr, threshold

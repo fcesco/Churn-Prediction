@@ -8,6 +8,7 @@ plt.style.use('ggplot')
 def categorical_bar(x_column, y_column, table):
     temp = pd.crosstab(table[x_column], table[y_column].astype(bool))
     temp.plot(kind='bar', stacked=True, color=['red','blue'], grid=False)
+    plt.ylabel('count users')
     plt.show()
 
 
