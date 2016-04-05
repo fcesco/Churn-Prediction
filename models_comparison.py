@@ -105,7 +105,7 @@ class ModelComparator(object):
         cross_val_recall = cross_val_score(estimator=model.best_estimator, X=self.X_train,\
         y = self.y_train, scoring='recall', cv=5, n_jobs=-1)
         cross_val_precision = cross_val_score(estimator=model.best_estimator, X=self.X_train,\
-        y = self.y_train, scoring='recall', cv=5, n_jobs=-1)
+        y = self.y_train, scoring='precision', cv=5, n_jobs=-1)
         return cross_val_recall, cross_val_precision
 
     def test(self, model):
