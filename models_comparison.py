@@ -5,7 +5,7 @@ from sklearn.linear_model import SGDClassifier
 from sklearn.ensemble import GradientBoostingClassifier
 from sklearn.metrics import confusion_matrix, roc_curve
 from sklearn.grid_search import RandomizedSearchCV
-from sklearn.metrics import roc_curve, precision_score, accuracy_score
+from sklearn.metrics import roc_curve, precision_score, recall_score
 from scipy.stats import randint as sp_randint
 import numpy as np
 
@@ -116,8 +116,11 @@ class ModelComparator(object):
 
         """
         model.best_estimator.fit(self.X_train, self.y_train)
-        score =  model.best_estimator.score(self.X_test, self.y_test, scoring=self.model_scoring)
-        return score
+        if self.model_scoring == 'recall':
+            score = model.best_estimator.recall_score(self.X_test, self.y_test)
+        elif self.model_scoring == 'precision':
+            score = model.best_estimator.recall_score(self.X_test, self.y_test)
+        return scores
 
     def model_roc_curve(self, model):
         """
