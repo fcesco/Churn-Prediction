@@ -1,4 +1,4 @@
-from sklearn.cross_validation import cross_val_score
+from sklearn.cross_validation import cross_val_score, train_test_split
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.linear_model import SGDClassifier
@@ -65,7 +65,7 @@ class ModelComparator(object):
         self.X = X
         self.y = y
         self.X_train, self.X_test, self.y_train, self.y_test = \
-            cross_validation.train_test_split(X, y, test_size=0.3,
+            train_test_split(X, y, test_size=0.3,
             random_state=0)
 
     def compare_models(self):
@@ -115,14 +115,14 @@ class ModelComparator(object):
             score: score of the test validation
 
         """
-        model.best_estimator.fit(self.X_tran, self.y_train)
-        score =  self.best_model.score(X_test, y_test, scoring=self.model_scoring)
+        model.best_estimator.fit(self.X_train, self.y_train)
+        score =  model.best_estimator.score(self.X_test, self.y_test, scoring=self.model_scoring)
         return score
 
     def model_roc_curve(self, model):
         """
         Produce information for plotting the roc curve
-        
+
         """
         model.model.fit(self.X_train, self.y_train)
         prob = model.model.predict_proba(self.X_test)
