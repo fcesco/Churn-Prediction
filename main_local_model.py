@@ -52,13 +52,13 @@ if __name__=="__main__":
 
 
 
-    #X, y, user_id, facebook_id = Xy_create(merged_table, 'churn', '_id', 'facebook_id')
 
     #Models Comparison
-    # tree_param = ModelParams(DecisionTreeClassifier(), DECISION_TREE_PARAMS)
-    # rndF_param = ModelParams(RandomForestClassifier(), RANDOM_FOREST_PARAMS)
-    # sdg_param = ModelParams(SGDClassifier(), SDG_PARAMS)
-    # grd_param = ModelParams(GradientBoostingClassifier(), GRADIENT_BOOST_PARAMS)
-    # models = [tree_param, rndF_param, sdg_param, grd_param]
-    # model_comparator = ModelComparator(models, X, y, 'recall')
-    # model_comparator.compare_models()
+    #tree_param = ModelParams(DecisionTreeClassifier(), DECISION_TREE_PARAMS, 'decision')
+    X, y, user_id, facebook_id = Xy_create(merged_table, 'churn', '_id', 'facebook_id')
+    rndF_param = ModelParams(RandomForestClassifier(), RANDOM_FOREST_PARAMS, 'Random Forest')
+#    sdg_param = ModelParams(SGDClassifier(), SDG_PARAMS, 'sdg')
+    grd_param = ModelParams(GradientBoostingClassifier(), GRADIENT_BOOST_PARAMS, 'gradient_boos')
+    models =  [rndF_param, grd_param]
+    model_comparator = ModelComparator(models, X, y, 'recall')
+    model_comparator.compare_models()

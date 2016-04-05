@@ -1,11 +1,11 @@
-from sklearn.cross_validation import cross_val_score
+from sklearn.cross_validation import cross_val_score, train_test_split
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.linear_model import SGDClassifier
 from sklearn.ensemble import GradientBoostingClassifier
 from sklearn.metrics import confusion_matrix, roc_curve
 from sklearn.grid_search import RandomizedSearchCV
-from sklearn.metrics import roc_curve, precision_score, accuracy_score
+from sklearn.metrics import roc_curve, precision_score, recall_score
 from scipy.stats import randint as sp_randint
 import numpy as np
 
@@ -65,7 +65,7 @@ class ModelComparator(object):
         self.X = X
         self.y = y
         self.X_train, self.X_test, self.y_train, self.y_test = \
-            cross_validation.train_test_split(X, y, test_size=0.3,
+            train_test_split(X, y, test_size=0.3,
             random_state=0)
 
     def compare_models(self):
@@ -115,16 +115,20 @@ class ModelComparator(object):
             score: score of the test validation
 
         """
-        model.best_estimator.fit(self.X_tran, self.y_train)
-        score =  self.best_model.score(X_test, y_test, scoring=self.model_scoring)
+        model.best_estimator.fit(self.X_train, self.y_train)
+        y_pred = model.best_estimator.predict(self.X_test)
+        if self.model_scoring == 'recall':
+            score = recall_score(self.y_test, y_pred)
+        elif self.model_scoring == 'precision':
+            score = precision_score(self.y_test, y_pred)
         return score
 
     def model_roc_curve(self, model):
         """
         Produce information for plotting the roc curve
-        
+
         """
         model.model.fit(self.X_train, self.y_train)
-        prob = model.model.predict_proba(self.X_test)
+        prob = model.best_estimator.predict_proba(self.X_test)[:,1]
         fpr, tpr, threshold = roc_curve(self.y_test, prob, pos_label=1)
         return fpr, tpr, threshold
