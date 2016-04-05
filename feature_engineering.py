@@ -112,11 +112,9 @@ def clean_user(df):
     df = pd.get_dummies(df, columns=['gender'])
     df.drop('gender_female', axis=1, inplace=True)
     df = integerize(df, 'manage_pages')
-    df = integerize(df, 'valid_token')
     df = integerize(df, 'public')
     df = integerize(df, 'publish_actions')
     df.drop('last_login', axis=1, inplace=1)
-
     return df
 
 
