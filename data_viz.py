@@ -4,7 +4,7 @@ from sklearn.metrics import roc_curve
 import seaborn as sns
 plt.style.use('ggplot')
 
-def save_categorical_plot(table, y_column):
+def save_categorical_plots(table, y_column):
     for column in table.columns:
         if column != y_column:
             if len(table[column].unique()) <= 3:
@@ -16,16 +16,24 @@ def categorical_bar(x_column, y_column, table):
     plt.ylabel('users count')
     plt.savefig('pictures/'+x_column+'.png')
 
+def save_violin_plots(table, y_column):
+    for column in table.columns:
+        if column != y_column and column !=  '_id' and column != 'facebook_id':
+            if len(table[column].unique()) > 3:
+                violin_plot(column, y_column, table)
 
-def plot_swarm_violin(x_column, y_column, table):
+def violin_plot(x_column, y_column, table):
     sns.violinplot(x=y_column, y=x_column, data=table, bw=.1)
+    plt.ylim([0,table[x_column].mean()*15])
     plt.show()
 
 def roc_curve_models(models):
     for model in models:
-        plt.plot(fpr, tpr, label = model.name)
+        plt.plot(model.fpr, model.tpr, label = model.name)
     plt.title('ROC curve of the models')
-    plt.legend(loc=best)
+    plt.xlabel('FPR')
+    plt.ylabel('TPR')
+    plt.legend(loc='best')
     plt.show()
 
 def plot_continuos_variables(df, column, y_column):
