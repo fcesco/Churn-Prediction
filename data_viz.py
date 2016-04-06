@@ -1,5 +1,6 @@
 import matplotlib.pyplot as plt
 import pandas as pd
+import numpy as np
 from sklearn.metrics import roc_curve
 import seaborn as sns
 plt.style.use('ggplot')
@@ -36,20 +37,15 @@ def roc_curve_models(models):
     plt.legend(loc='best')
     plt.show()
 
-def plot_continuos_variables(df, column, y_column):
-    '''
-    plot histogram of continuos variable
-    '''
-    churn = df[df[y_column]==1][column]
-    no_churn = df[df[y_column==0]][column]
-    plt.hist(churn, bins=20, histtype='stepfilled', normed=True, color='r', label='Churn')
-    plt.hist(no_churn, bins=20, histtype='stepfilled', normed=True, color='b', alpha=0.5, label='Engaged users')
-    plt.title("%s churn/engaged users Histogram")
-    plt.xlabel("Value")
-    plt.ylabel("Quantity")
-    plt.legend()
+def plot_feature_importances(forest, table):
+    importances = forest.feature_importances_
+    std =np.std([tree.feature_importances_ for tree in forest.estimators_],
+                axis=0)
+    indices = np.argsort(importances)[::-1][:-5]
+    plt.figure()
+    plt.title("Feature importances")
+    plt.bar(range(table.shape[1]-5), importances[indices], color='r',
+            yerr=std[indices], align="center")
+    plt.xticks(range(table.shape[1]-5), table.columns[indices], rotation=45)
+    plt.xlim([-1, table.shape[1]-5])
     plt.show()
-
-def plot_binary_variables(df, column, y_column):
-    plt.hist(x, n_bins, normed=1, histtype='bar', stacked=True)
-    ax1.set_title('stacked bar')
