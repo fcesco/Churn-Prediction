@@ -5,3 +5,4 @@ stream\ impression
 *.json
 *.pyc
 merged_table
+model/
