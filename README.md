@@ -53,7 +53,7 @@ Two model were compared: the Random forest and the Extra trees model. The compar
 
 We need also to decide which FPR we need. A rate around 55% is the best choice for our model because is the point where the curve slope start to decrease. Thus, the threshold chosen is 0.21 which means that each users that have a probability to churn higher than 0.21 is labeled as churn.
 
-![figure five - ROC Curve](pictures/ROC_Curve.png)
+![figure five - ROC Curve](pictures/roc.png)
 
 ### <a name="result"></a> Result
 Finally, we can test our final model on the test set which is not used on the previous steps. The recall obtained on the test set is 0.9 and a precision of 0.46.
