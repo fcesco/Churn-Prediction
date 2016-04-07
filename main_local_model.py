@@ -25,20 +25,6 @@ EXTRA_TREES_PARAMS = {"n_estimators": range(10, 200, 10),
                         "min_samples_leaf": [1, 2, 4, 5]
                         }
 
-GRADIENT_BOOST_PARAMS = {"loss": ['deviance', 'exponential'],
-                            "learning_rate": list(np.arange(0.01, 0.8, 0.1)),
-                            "n_estimators": range(10, 200, 10),
-                            "max_depth": range(1, 10, 1),
-                            "min_samples_split": [2, 4, 6],
-                            "min_samples_leaf": [1, 2, 4, 5]
-                            }
-
-SVM = {"C": list(np.arange(0.01, 1, 0.05)),
-                            "kernel": ['poly', 'rbf', 'sigmoid'],
-                            "degree": range(3, 10, 1),
-                            "coef0": list(np.arange(0.01, 2, 0.1))
-                            }
-
 def data_munging_engineering():
     churn_days = 10
     stream_table, user_table = import_data()
@@ -56,8 +42,7 @@ def model_choice(merged_table):
     X, y, user_id, facebook_id = Xy_create(merged_table, 'churn', '_id', 'facebook_id')
     rndF_param = ModelParams(RandomForestClassifier(), RANDOM_FOREST_PARAMS, 'Random Forest')
     extra_param = ModelParams(ExtraTreesClassifier(), EXTRA_TREES_PARAMS, 'extra')
-    grd_param = ModelParams(GradientBoostingClassifier(), GRADIENT_BOOST_PARAMS, 'gradient_boos')
-    models =  [rndF_param, extra_param, grd_param]
+    models =  [rndF_param, extra_param]
     model_comparator = ModelComparator(models, X, y, 'recall')
     model_comparator.compare_models()
     return model_comparator

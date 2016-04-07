@@ -290,31 +290,6 @@ def n_connections(edges_path, df):
     return df
 
 
- # def create_node_value(churn_prob, user_id):
- #     churn_prob = pd.DataFrame(data = {'user_id': user_id , 'churn_prob': churn_prob})
- #     return churn_prob
-#
-#
-# def weighted_edges(edges_file, impressions_folder, user):
-#     '''
-#     create weighted edges
-#     '''
-#     column = ['time', 'distinct_id', 'app_release', 'app_version', 'carrier', 'city', 'ios_ifa', 'lib_version', 'manufacturer', 'model', 'name', 'os', 'os_version', 'radio', 'region',  'screen_height', 'screen_width', 'wifi', 'account_status', 'audio', 'broadcaster_id', 'broadcaster_name', 'candies_sent', 'comments_sent', 'facebook_post_id', 'mode', 'page',  'public', 'screen', 'stream_duration', 'stream_id', 'stream_message', 'type', 'video', 'views_on_join', 'facebook_id', 'gender', 'locale', 'mp_country_code', 'mp_device_model', 'mp_lib', 'elapsed', 'app_version', 'screen_dpi', 'brand']
-#     edges = pd.read_csv(edges_file)
-#     edges = edges[edges.exists==True]
-#     edges.insert(0, 'weight',1)
-#     edges = edges[(edges.follower.isin(user.facebook_id.values)) & (edges.followed.isin(user.facebook_id.values))]
-#     for (dirpath, dirnames, filenames) in walk(impressions_folder):
-#         filenames = [impressions_folder+filename for filename in filenames if not filename[0]=='.']
-#         for filename in filenames:
-#             impression = pd.read_table(filename, engine='python', header=None, names =column)
-#             edges['weight'] += edges.apply(lambda x: weight_edge(x, impression, user), axis = 1)
-#     return edges
-#
-# def weight_edge(x, impression, user):
-#     if any((impression['broadcaster_id'].isin(user[x['followed']==user['facebook_id']]['_id'])) & (impression['distinct_id'].isin(user[x['follower']==user['facebook_id']]['_id']))):
-#         return 1
-#     else: return 0
 
 def Xy_create(df, column_y, column_id, column_facebook_id):
     '''
@@ -337,59 +312,3 @@ def Xy_create(df, column_y, column_id, column_facebook_id):
     df.drop(column_id, axis=1, inplace=True)
     X = df.values
     return X, y, user_id, facebook_id
-
-
-# def smooting(X, y):
-#     '''
-#     Smoote the dataset obtaining a balanced dataset
-#     Args:
-#         X: exogenous variable (numpy matrix)
-#         y: endogenous variable (numpy array)
-#     Return:
-#         smox: balaned exogenous variable (numpy matrix)
-#         smoy: balanced endogenous variable (numpy matrix)
-#     '''
-#     smote = SMOTE(ratio=float(np.count_nonzero(y == 0)) /
-#         float(np.count_nonzero(y == 1)), verbose=False, kind='regular')
-#     smox, smoy = smote.fit_transform(X, y)
-#     return smox, smoy
-#     #
-    # if __name__ == "__main__":
-    #     impression_path = '/Users/Fra/Documents/Streamago/Streamago_churn_study/ \
-    #     churn_analysis/stream impression/'
-    #     edges_path = '/Users/Fra/Documents/Streamago/Streamago_churn_study/\
-    #     churn_analysis/graph/notify.csv'
-    #     stream_table, user_table = import_data()
-    #     strem_table, user_table = drop_features(stream_table, user_table)
-    #     user_table = clean_user(user_table)
-    #     user_table = create_churn(user_table, 14)
-    #     merged_data = stream_user_merging(stream_table, user_table)
-    #     merged_data = impression_user_merging('/Users/Fra/Documents/Streamago/\
-    #     Streamago_churn_study/churn_analysis/stream impression/', merged_data)
-    #     merged_data = merged_data.fillna(-1)
-    #     X, y, user_id = Xy_create(merged_data, 'churn', '_id')
-    #     X_train, X_test, y_train, y_test = cross_validation.train_test_split(X, y,
-    #         test_size=0.3, random_state=0)
-    #     smox, smoy = smooting(X_train, y_train)
-
-    #
-    # rndF = ensemble.RandomForestClassifier()
-    # score = cross_validation.cross_val_score(rndF, X_train, y_train)
-    # rndF.fit(X_train,y_train)
-    # rndF.score(X_test, y_test)
-    # #
-    # param_dist = {"max_depth": [3, None],
-    #           "max_features": sp_randint(1, 11),
-    #           "min_samples_split": sp_randint(1, 11),
-    #           "min_samples_leaf": sp_randint(1, 11),
-    #           "bootstrap": [True, False],
-    #           "criterion": ["gini", "entropy"]}
-    #
-    # n_iter_search = 20
-    # random_search = RandomizedSearchCV(rndF, param_distributions=param_dist, n_iter=n_iter_search)
-    # random_search.fit(X,y)
-    # best_model = random_search.best_estimator_
-    # best_features = best_model.feature_importances_.argsort()[::-1]
-    # X_best = X[:,best_features[0:15]]
-    # X_train_best = X_train[:, best_features[0:15]]
-    # X_test_best = X_test[:, best_features[0:15]]
