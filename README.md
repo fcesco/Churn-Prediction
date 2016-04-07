@@ -1,4 +1,3 @@
-#Work in Progress
 
 ## Streamago Churn Prediction
 Using data science algorithms in order to predict users of Streamago that will churn.
