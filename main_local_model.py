@@ -26,11 +26,17 @@ EXTRA_TREES_PARAMS = {"n_estimators": range(10, 200, 10),
                         }
 
 GRADIENT_BOOST_PARAMS = {"loss": ['deviance', 'exponential'],
-                            "learning_rate": list(np.arange(0.01, 10, 0.8)),
+                            "learning_rate": list(np.arange(0.01, 0.8, 0.1)),
                             "n_estimators": range(10, 200, 10),
                             "max_depth": range(1, 10, 1),
                             "min_samples_split": [2, 4, 6],
                             "min_samples_leaf": [1, 2, 4, 5]
+                            }
+
+SVM = {"C": list(np.arange(0.01, 1, 0.05)),
+                            "kernel": ['poly', 'rbf', 'sigmoid'],
+                            "degree": range(3, 10, 1),
+                            "coef0": list(np.arange(0.01, 2, 0.1))
                             }
 
 def data_munging_engineering():
