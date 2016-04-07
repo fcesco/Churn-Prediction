@@ -27,6 +27,7 @@ Data is stored in a postgres database and in .csv files. In the database there a
 ### <a name="pipeline"></a> What is Churn?
 Generally speaking, churn is a user of a service which left the service for a given time period. In this case churn was defined following the suggestion of the analytics team of Streamago: a person that do not use the app for 7-14 days.
 
+
 ### <a name="pipeline"></a> Pipeline
 Below, it is represented the pipeline of my study.
 
@@ -48,10 +49,11 @@ Similar to *total_views*, the violin plot of *comments_count* shows that users t
 ![figure four - Comments count](pictures/comments_count.png)
 
 ### <a name="model_comparison"></a> Models Comparison
-Models comparison has followed this pipeline
+Two model were compared: the Random forest and the Extra trees model. The comparison, was made first doing a random search of the best hyper-parameters of each model and then comparing the output through a ROC curve. The ROC curve shows that the Random Forest model outperformed the Extra trees model, thus Random Forest is our first choice.
 
-here you can see the
+We need also to decide which FPR we need. A rate around 55% is the best choice for our model because is the point where the curve slope start to decrease. Thus, the threshold chosen is 0.21 which means that each users that have a probability to churn higher than 0.21 is labeled as churn.
+
+![figure five - ROC Curve](pictures/ROC_Curve.png)
 
 ### <a name="result"></a> Result
-
-### <a name="note"></a> Note
+Finally, we can test our final model on the test set which is not used on the previous steps. The recall obtained on the test set is 0.9 and a precision of 0.46.
