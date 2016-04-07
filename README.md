@@ -1,6 +1,6 @@
 #Work in Progress
 
-## Streamago Churn analysis
+## Streamago Churn Prediction
 Using data science algorithms in order to predict churn of Streamago application.
 
 i. Contents
@@ -16,25 +16,27 @@ i. Contents
 
 
 ### <a name="streamago"></a> What is Streamago?
-Streamago is an emerging startup of live streaming video with more than 130k DAU and 500 MAU. Streamago lets you interact with your close friends and to meet new one through live video. Users can comments and likes live streams in real time. In the end is possible to follow your new friends.
+Live video streaming selfies app Streamago is an emerging startup of live streaming videos. Streamago lets you interact with your close friends and to meet new ones. Users can comment and like live streams in real time. It is also possible to follow your friends and do not miss a video.
 
 ![figure one - specific technologies](img/st.png)
 
 
 ### <a name="motivation"></a> Motivation
-Accomplish a churn prediction and use the information to target push notification or reward to churning users might improve user retention. Moreover, understanding which features are the most important for users will focus the app improvements.
+Churn prediction help the organic growth targeting users that might churn using push notifications or rewards. Moreover, in order to produce a churn prediction model it is necessary to understand which features are the most important. This is a precious information and help to understand what users love about the app.
 
 ### <a name="data"></a> Data
-Data is stored in a postgres database and in csv files. In the database there are 2 tables, one includes user and the other streams information. The analytics team of Streamago provided me also csv files. One csv file for each day called stream impression which include actions of users while watching a video. In the end, they provided me also a directed graph stored in a csv file with the information of the Streamago's social network.
+Data is stored in a postgres database and in .csv files. In the database there are 2 tables, one includes users and the other streams information. In the .csv files there are information called stream impressions which include actions of users while watching a video. In the end, they provided me also a directed graph stored in a .csv file with the information of the Streamago's social network.
 
 ### <a name="pipeline"></a> Data
-Some features
+
 
 ### <a name="data_exploration"></a> Data Exploration
+The databases and table were explored and a first selection of features was made plotting each feature. Below, you are showed some of plots that helped during the features selection process.
 
 ### <a name="model_comparison"></a> Models Comparison
+Models comparison has followed this pipeline
 
-### <a name="graph_algorithm"></a> Graph Algorithm
+here you can see the 
 
 ### <a name="result"></a> Result
 
