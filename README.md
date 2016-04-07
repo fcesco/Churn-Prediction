@@ -24,7 +24,11 @@ Churn prediction help the organic growth targeting users that might churn using 
 ### <a name="data"></a> Data
 Data is stored in a postgres database and in .csv files. In the database there are 2 tables, one includes users and the other streams information. In the .csv files there are information called stream impressions which include actions of users while watching a video. In the end, they provided me also a directed graph stored in a .csv file with the information of the Streamago's social network.
 
-### <a name="pipeline"></a> Data
+### <a name="pipeline"></a> What is Churn?
+Generally speaking, churn is a user of a service which left the service for a given time period. In this case churn was defined following the suggestion of the analytics team of Streamago: a person that do not use the app for 7-14 days.
+
+### <a name="pipeline"></a> Pipeline
+Below, it is rapprasented the p
 
 ![figure one - Pipeline](pictures/pipeline.png)
 
