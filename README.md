@@ -28,16 +28,24 @@ Data is stored in a postgres database and in .csv files. In the database there a
 Generally speaking, churn is a user of a service which left the service for a given time period. In this case churn was defined following the suggestion of the analytics team of Streamago: a person that do not use the app for 7-14 days.
 
 ### <a name="pipeline"></a> Pipeline
-Below, it is rapprasented the p
+Below, it is represented the pipeline of my study.
 
 ![figure one - Pipeline](pictures/pipeline.png)
 
 ### <a name="data_exploration"></a> Data Exploration
-The databases and table were explored and a first selection of features was made plotting each feature. Below, you are showed some of plots that helped during the features selection process.
+The databases and table were explored and a first selection of features was made plotting each feature. Below, there are showed some of plots that helped during the features selection process.
+
+The *total_views* violin plot shows the higher number of views for users that did not churn which means predictive power.
 
 ![figure two - Total views](pictures/total_views.png)
+
+From the *publish_actions* bar plot it is noticeable how users that churn tend to publish less actions compare to users that do not churn.
+
 ![figure three - Publish Actions](pictures/publish_actions.png)
-![figure four - Comments count](pictures/publish_actions.png)
+
+Similar to *total_views*, the violin plot of *comments_count* shows that users that won't churn have higher numbers of comments.
+
+![figure four - Comments count](pictures/comments_count.png)
 
 ### <a name="model_comparison"></a> Models Comparison
 Models comparison has followed this pipeline
