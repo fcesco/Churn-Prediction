@@ -33,7 +33,7 @@ Below, it is represented the pipeline of my study.
 ![figure one - Pipeline](pictures/pipeline.png)
 
 ### <a name="data_exploration"></a> Data Exploration
-The databases and table were explored and a first selection of features was made plotting each feature. Below, there are showed some of plots that helped during the features selection process.
+The data was explored and a first selection of features was made plotting each feature. Below, there are showed some of plots that helped during the features selection process.
 
 The *total_views* violin plot shows the higher number of views for users that did not churn which means predictive power.
 
