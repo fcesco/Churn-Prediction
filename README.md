@@ -1,7 +1,7 @@
 #Work in Progress
 
 ## Streamago Churn Prediction
-Using data science algorithms in order to predict churn of Streamago application.
+Using data science algorithms in order to predict users of Streamago that will churn.
 
 i. Contents
 + [What is Streamago?](#streamago)
@@ -18,7 +18,7 @@ i. Contents
 Live video streaming selfies app Streamago is an emerging startup of live streaming videos. Streamago lets you interact with your close friends and to meet new ones. Users can comment and like live streams in real time. It is also possible to follow your friends and do not miss a video.
 
 ### <a name="motivation"></a> Motivation
-Churn prediction helps the app growth. In fact, is possible to improve user retention targeting users that might churn using push notifications or rewards. Moreover, in order to produce a churn prediction model it is necessary to explore the features and so it is possible to understand are the most important. This is a precious information and help to understand what users love about the app.
+Predict users that will churn is an important step for a service as Streamago. In fact, is possible to improve user retention targeting users that might churn using push notifications or rewards. Moreover, in order to produce a churn prediction model it is necessary to explore the features and so it is possible to understand are the most important. This is a precious information and help to understand what users love about the app.
 
 ### <a name="data"></a> Data
 Data is stored in a postgres database and in .csv files. In the database there are 2 tables, one includes users and the other streams information. In the .csv files there are information called stream impressions which include actions of users while watching a video. In the end, they provided me also a directed graph stored in a .csv file with the information of the Streamago's social network.
@@ -62,9 +62,3 @@ The other important features are the feature related to the type of the device a
 
 ### <a name="result"></a> Result
 Finally, we can test our final model on the test set which is not used on the previous steps. The recall obtained on the test set is 0.55 and a precision of 0.6.
-
-
-
-### <a name="result"></a> Comments
-This result
-This is the initial study for a more accurate churn prediction model are necessary
