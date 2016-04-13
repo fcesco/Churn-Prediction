@@ -31,7 +31,7 @@ Below, it is represented the pipeline of my study.
 ![figure one - Pipeline](pictures/pipeline.png)
 
 ### <a name="data_exploration"></a> Data Exploration | Feature engineering
-The data was explored and a first selection of features was made reading their values and if a feature had less 2 unique values it was ignored. Afterwards, new features were produced and in the end a  Below, there are showed some of plots that helped during the features selection process.
+The data was explored and a first selection of features was made reading their values and if a feature had less 2 unique values it was ignored. Afterwards, new features were produced. Below, are showed some of plots that helped during the features selection process.
 
 The *total_views* violin plot shows the higher number of views for users that did not churn which means predictive power.
 
