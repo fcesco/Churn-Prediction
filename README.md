@@ -12,7 +12,6 @@ i. Contents
 + [Graph Algorithm](#graph_algorithm)
 + [Feature importances](#feature_importances)
 + [Result](#result)
-+ [Note](#note)
 
 ### <a name="streamago"></a> What is Streamago?
 Live video streaming selfies app Streamago is an emerging startup of live streaming videos. Streamago lets you interact with your close friends and to meet new ones. Users can comment and like live streams in real time. It is also possible to follow your friends and do not miss a video.
