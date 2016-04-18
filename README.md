@@ -10,6 +10,7 @@ i. Contents
 + [Data Exploration](#data_exploration)
 + [Models comparison](#model_comparison)
 + [Graph Algorithm](#graph_algorithm)
++ [Feature importances](#feature_importances)
 + [Result](#result)
 + [Note](#note)
 
@@ -52,7 +53,7 @@ We need also to decide which FPR we need. A rate around 55% is the best choice f
 
 ![figure five - ROC Curve](pictures/roc.png)
 
-### <a name="result"></a> Feature importances
+### <a name="feature_importances"></a> Feature importances
 
 Here, is showed the feature importances of the random forest. As you can see the most important features are related to the activity of the user.
 The other important features are the feature related to the type of the device and quality of the network like: width and height of the screen, and bit rate of the network.
