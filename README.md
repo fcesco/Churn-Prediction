@@ -1,6 +1,6 @@
 
 ## Streamago Churn Prediction
-Using data science algorithms in order to predict users of Streamago that will churn.
+Using data science algorithms in order to predict users of Streamago that will churn in the next week.
 
 i. Contents
 + [What is Streamago?](#streamago)
@@ -14,7 +14,7 @@ i. Contents
 + [Result](#result)
 
 ### <a name="streamago"></a> What is Streamago?
-Live video streaming selfies app Streamago is an emerging startup of live streaming videos. Streamago lets you interact with your close friends and to meet new ones. Users can comment and like live streams in real time. It is also possible to follow your friends and do not miss a video.
+Live streaming selfies app Streamago is an emerging startup of live streaming videos. Streamago lets you interact with your close friends and new ones. Users can comment and like live streams in real time. It is also possible to follow your friends and do not miss a video.
 
 ### <a name="motivation"></a> Motivation
 Predict users that will churn is an important step for a service as Streamago. In fact, is possible to improve user retention targeting users that might churn using push notifications or rewards. Moreover, in order to produce a churn prediction model it is necessary to explore the features and so it is possible to understand are the most important. This is a precious information and help to understand what users love about the app.
@@ -23,7 +23,7 @@ Predict users that will churn is an important step for a service as Streamago. I
 Data is stored in a postgres database and in .csv files. In the database there are 2 tables, one includes users and the other streams information. In the .csv files there are information called stream impressions which include actions of users while watching a video. In the end, they provided me also a directed graph stored in a .csv file with the information of the Streamago's social network.
 
 ### <a name="pipeline"></a> What is Churn?
-Generally speaking, churn is a user of a service which left the service for a given time period. In this case churn was defined following the suggestion of the analytics team of Streamago: a person that do not use the app for 7-14 days.
+Generally speaking, churn is a user which left the service for a given time period. In this case churn was defined following the suggestion of the analytics team of Streamago: a person that do not use the app for 7-14 days.
 
 ### <a name="pipeline"></a> Pipeline
 Below, it is represented the pipeline of my study.
@@ -31,7 +31,7 @@ Below, it is represented the pipeline of my study.
 ![figure one - Pipeline](pictures/pipeline.png)
 
 ### <a name="data_exploration"></a> Data Exploration | Feature engineering
-The data was explored and a first selection of features was made reading their values and if a feature had less 2 unique values it was ignored. Afterwards, new features were produced. Below, are showed some of plots that helped during the features selection process.
+The data was explored and a first selection of features was made reading their values and if a feature had less 2 unique values it was ignored. Afterwards, new features were produced combining columns. Below, are showed some of plots that helped during the features selection process.
 
 The *total_views* violin plot shows the higher number of views for users that did not churn which means predictive power.
 
@@ -48,7 +48,7 @@ Similar to *total_views*, the violin plot of *comments_count* shows that users t
 ### <a name="model_comparison"></a> Models Comparison
 Two model were compared: the Random forest and the Extra trees model. The comparison, was made first doing a random search of the best hyper-parameters of each model and then comparing the output through a ROC curve. The ROC curve shows that the Random Forest model outperformed the Extra trees model, thus Random Forest is our first choice.
 
-We need also to decide which FPR we need. A rate around 55% is the best choice for our model because is the point where the curve slope start to decrease. Thus, the threshold chosen is 0.454 which means that each users that have a probability to churn higher than 0.454 is labeled as churn.
+We have to decide which FPR we need. A rate around 55% is the best choice for our model because is the point where the curve slope start to decreases. Thus, the threshold chosen is 0.454 which means that each users that have a probability to churn higher than 0.454 is labeled as churn.
 
 ![figure five - ROC Curve](pictures/roc.png)
 
@@ -60,4 +60,6 @@ The other important features are the feature related to the type of the device a
 ![figure five - ROC Curve](pictures/feature_importances.png)
 
 ### <a name="result"></a> Result
-Finally, we can test our final model on the test set which is not used on the previous steps. The recall obtained on the test set is 0.55 and a precision of 0.6.
+Finally, we can test our final model on the test set which is not used on the previous steps. The recall obtained on the test set is 0.55 and a precision of 0.6 which is what we expected from the cross validation.
+
+
